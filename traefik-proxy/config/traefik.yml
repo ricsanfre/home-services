@@ -1,0 +1,47 @@
+api:
+  # Enable Dashboard
+  dashboard: true
+  debug: true
+
+
+# Entry Points
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entrypoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
+# Providers
+providers:
+  docker:
+    endpoint: "tcp://docker-proxy:2375"
+    watch: true
+    exposedbydefault: false
+    network: frontend
+  file:
+    directory: /etc/traefik
+    watch: true
+
+# Logging
+log:
+  level: "INFO"
+  filePath: "/var/log/traefik/traefik.log"
+accessLog:
+  filePath: "/var/log/traefik/access.log"
+
+# Certificate resolvers
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: admin@ricsanfre.com
+      storage: acme.json
+      dnsChallenge:
+        provider: ionos
+        resolvers: 
+          - 1.1.1.1:53
+          - 8.8.8.8:53 

@@ -1,0 +1,65 @@
+# Keep IONOS API KEY in  a secret
+secrets:
+  ionos-api-key:
+    file: ./ionos-api-key
+
+services:
+  # Securing docker.sock access
+  docker-proxy:
+    container_name: docker-proxy
+    environment:
+      CONTAINERS: 1
+    image: tecnativa/docker-socket-proxy
+    networks:
+      - backend
+    ports:
+      - 2375
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  # Traefik front-end
+  traefik:
+    depends_on:
+      - docker-proxy
+    image: traefik
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    secrets:
+      - ionos-api-key 
+    networks:
+      frontend:
+      backend:
+    ports:
+      # Expose HTTP and HTTPS ports to host
+      - 80:80
+      - 443:443
+    environment:
+      - IONOS_API_KEY=/run/secrets/ionos-api-key # See required format of IONOS_API_KEY in https://go-acme.github.io/lego/dns/ionos/    
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./config/:/etc/traefik/:ro
+      - ./cert/acme.json:/acme.json:rw
+      - ./logs:/var/log/traefik:rw
+    # Support containers using host networking
+    # https://doc.traefik.io/traefik/providers/docker/#host-networking
+    extra_hosts:
+     - host.docker.internal:host-gateway
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.rule=Host(`${HOSTNAME}`)
+      - traefik.http.routers.traefik.tls.domains[0].main=${HOSTNAME}
+      - traefik.http.routers.traefik.tls.domains[0].sans=*.${HOSTNAME}
+      - traefik.http.routers.traefik.entrypoints=websecure
+      - traefik.http.routers.traefik.tls.certresolver=letsencrypt
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.middlewares=strip
+      - traefik.http.middlewares.strip.stripprefix.prefixes=/traefik
+
+# Use external global networks instead of default behaviour (new networs per docker-compose file)
+networks:
+  frontend:
+    external: true
+  backend:
+    external: true
