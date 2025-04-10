@@ -36,7 +36,7 @@ services:
       - 80:80
       - 443:443
     environment:
-      - IONOS_API_KEY=/run/secrets/ionos-api-key # See required format of IONOS_API_KEY in https://go-acme.github.io/lego/dns/ionos/    
+      - IONOS_API_KEY_FILE=/run/secrets/ionos-api-key # See required format of IONOS_API_KEY in https://go-acme.github.io/lego/dns/ionos/
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./config/:/etc/traefik/:ro
@@ -48,14 +48,19 @@ services:
      - host.docker.internal:host-gateway
     labels:
       - traefik.enable=true
+      - traefik.http.routers.traefik.entrypoints=websecure
       - traefik.http.routers.traefik.rule=Host(`${HOSTNAME}`)
+      # TLS certificate
+      - traefik.http.routers.traefik.tls=true
       - traefik.http.routers.traefik.tls.domains[0].main=${HOSTNAME}
       - traefik.http.routers.traefik.tls.domains[0].sans=*.${HOSTNAME}
-      - traefik.http.routers.traefik.entrypoints=websecure
       - traefik.http.routers.traefik.tls.certresolver=letsencrypt
-      - traefik.http.routers.traefik.service=api@internal
-      - traefik.http.routers.traefik.middlewares=strip
+      # Middlewares
+      - traefik.http.routers.traefik.middlewares=traefik-auth,strip
+      - traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}
       - traefik.http.middlewares.strip.stripprefix.prefixes=/traefik
+      # Services
+      - traefik.http.routers.traefik.service=api@internal
 
 # Use external global networks instead of default behaviour (new networs per docker-compose file)
 networks:
