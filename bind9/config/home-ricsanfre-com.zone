@@ -1,0 +1,21 @@
+$TTL 2d
+
+$ORIGIN home.ricsanfre.com.
+
+@             IN     SOA    ns.home.ricsanfre.com. admin.ricsanfre.com (
+                            2025040801     ; serial
+                            12h            ; refresh
+                            15m            ; retry
+                            3w             ; expire
+                            2h )           ; minimum TTL
+
+                IN     NS     ns.home.ricsanfre.com.
+
+ns              IN     A      192.168.1.19
+
+khazad-dum      IN     A      192.168.1.19
+*.khazad-dum    IN     A      192.168.1.19
+media           IN     A      192.168.1.19
+5etools         IN     A      192.168.1.19
+minas-morgul    IN     A      192.168.1.20
+*.minas-morgul  IN     A      192.168.1.20
