@@ -1,0 +1,23 @@
+$TTL 2d
+
+$ORIGIN oci.ricsanfre.com.
+
+@             IN     SOA    ns.oci.ricsanfre.com. admin.ricsanfre.com (
+                            2025111301     ; serial
+                            12h            ; refresh
+                            15m            ; retry
+                            3w             ; expire
+                            2h )           ; minimum TTL
+
+                IN     NS     ns.oci.ricsanfre.com.
+
+ns              IN     A      192.168.1.19
+
+oci-web         IN     A      130.61.142.49
+*.ociweb        IN     A      130.61.142.49
+oci-amd-1       IN     A      130.162.246.136
+*.oci-amd-1     IN     A      130.162.246.136
+oci-amd-2       IN     A      158.180.21.253
+*.oci-amd-2     IN     A      158.180.21.253
+oci-arm-1       IN     A      130.61.123.199
+*.oci-arm-1     IN     A      130.61.123.199
