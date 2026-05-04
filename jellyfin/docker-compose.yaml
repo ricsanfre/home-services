@@ -22,7 +22,7 @@ services:
       - 'traefik.enable=true'
       ## HTTP Router
       #### Entry point where Jellyfin is accessible via
-      - 'traefik.http.routers.jellyfin.entryPoints=https'
+      - 'traefik.http.routers.jellyfin.entryPoints=websecure'
       #### Host or Path where Jellyfin is accessible
       #### Remove (or change) this rule if you'd rather have Jellyfin accessible at a PathPrefix URI
       - 'traefik.http.routers.jellyfin.rule=Host(`$JELLYFIN_HOST_NAME`)'
@@ -64,10 +64,3 @@ services:
       - 'traefik.http.routers.jellyfin.service=jellyfin'
       - 'traefik.http.services.jellyfin.loadBalancer.server.port=8096'
       - 'traefik.http.services.jellyfin.loadBalancer.passHostHeader=true'
-      ## Redirection of HTTP to HTTPS
-      - 'traefik.http.routers.jellyfin-insecure.entryPoints=http'
-      - 'traefik.http.routers.jellyfin-insecure.rule=Host(`$JELLYFIN_HOST_NAME`)'
-      - 'traefik.http.routers.jellyfin-insecure.middlewares=jellyfin-insecure-mw'
-      - 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.scheme=https'
-      - 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.permanent=false'
-      - 'traefik.http.routers.jellyfin-insecure.service=noop@internal'
