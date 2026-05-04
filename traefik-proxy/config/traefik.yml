@@ -10,7 +10,7 @@ entryPoints:
     address: ":80"
     http:
       redirections:
-        entrypoint:
+        entryPoint:
           to: websecure
           scheme: https
   websecure:
@@ -19,9 +19,9 @@ entryPoints:
 # Providers
 providers:
   docker:
-    endpoint: "tcp://docker-proxy:2375"
+    endpoint: "unix:///var/run/docker.sock"
     watch: true
-    exposedbydefault: false
+    exposedByDefault: false
     network: frontend
   file:
     directory: /etc/traefik
@@ -36,7 +36,7 @@ accessLog:
 
 # Certificate resolvers
 certificatesResolvers:
-  letsencrypt:
+  ionos:
     acme:
       email: admin@ricsanfre.com
       storage: acme.json
