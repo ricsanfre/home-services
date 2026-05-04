@@ -1,0 +1,38 @@
+services:
+  vault:
+    image: hashicorp/vault:1.21
+    container_name: vault
+    hostname: vault
+    networks:
+      - frontend
+    restart: unless-stopped
+    environment:
+      VAULT_ADDR: "https://$VAULT_URL"
+      VAULT_API_ADDR: "https://$VAULT_URL"
+      VAULT_ADDRESS: "https://$VAULT_URL"
+    volumes:
+      - vault-data:/vault/data/:rw
+      - ./config:/vault/config/:rw
+    cap_add:
+      - IPC_LOCK
+    entrypoint: vault server -config /vault/config/config.hcl
+    extra_hosts:
+      - kube-api.local.test:host-gateway
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vault.entrypoints=webs"
+      - "traefik.http.routers.vault.rule=Host(`$VAULT_URL`)"
+      - "traefik.http.routers.vault-secure.entrypoints=websecure"
+      - "traefik.http.routers.vault-secure.rule=Host(`$VAULT_URL`)"
+      - "traefik.http.routers.vault-secure.tls=true"
+      - "traefik.http.routers.vault-secure.tls.certresolver=ionos"
+      - "traefik.http.routers.vault-secure.service=vault"
+      - "traefik.http.services.vault.loadbalancer.server.port=8200"
+
+volumes:
+  vault-data:
+
+# Use external global networks instead of default behaviour (new networs per docker-compose file)
+networks:
+  frontend:
+    external: true
